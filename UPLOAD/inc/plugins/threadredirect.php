@@ -168,7 +168,7 @@ function threadredirect_showthread_start()
 			
 			if (isset($query['processed'])) {
 				// The user just created the thread, redirect back to the forum category
-				return redirect(get_forum_link($thread['fid']));
+				return header("Location: " . get_forum_link($thread['fid']));
 			}
 		}
 		
