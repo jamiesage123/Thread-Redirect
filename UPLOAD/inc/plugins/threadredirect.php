@@ -30,7 +30,7 @@ function threadredirect_info()
         "website"		=> "http://www.jamiesage.co.uk",
         "author"		=> "Jamie Sage",
         "authorsite"	=> "http://www.jamiesage.co.uk",
-        "version"		=> "0.1",
+        "version"		=> "0.2",
         "guid" 			=> "",
         "codename"		=> str_replace('.php', '', basename(__FILE__)),
         "compatibility"	=>	"18*"
