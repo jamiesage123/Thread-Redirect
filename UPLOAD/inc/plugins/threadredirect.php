@@ -21,12 +21,15 @@ $plugins->add_hook("showthread_start", "threadredirect_showthread_start");
   */
 function threadredirect_info()
 {
+	global $lang;
+	$lang->load("threadredirect", true);
+	
     return array(
         "name"			=> "Thread Redirect",
-        "description"	=> "Allow threads to redirect to a URL with optional custom text",
-        "website"		=> "",
+        "description"	=> $lang->threadredirect_desc,
+        "website"		=> "http://www.jamiesage.co.uk",
         "author"		=> "Jamie Sage",
-        "authorsite"	=> "www.jamiesage.co.uk",
+        "authorsite"	=> "http://www.jamiesage.co.uk",
         "version"		=> "0.1",
         "guid" 			=> "",
         "codename"		=> str_replace('.php', '', basename(__FILE__)),
@@ -74,14 +77,15 @@ function threadredirect_uninstall()
   */
 function threadredirect_activate()
 {
-	global $db;
+	global $db, $lang;
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
+	$lang->load("threadredirect", true);
 	
 	// Add the threadredirect template
 	$insert_array = array(
 		'title'		=> 'threadredirect',
 		'template'	=> $db->escape_string('<tr>
-		<td class="trow2"><strong>Redirect URL</strong></td>
+		<td class="trow2"><strong>' . $lang->threadredirect_redirect_url . '</strong></td>
 		<td class="trow2"><input type="text" class="textbox" name="threadredirect" size="40" maxlength="240" value="{$threadredirect}" tabindex="2" /></td>
 		</tr>'),
 		'sid'		=> '-1',
