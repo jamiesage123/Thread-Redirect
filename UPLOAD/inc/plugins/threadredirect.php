@@ -42,8 +42,34 @@ function threadredirect_info()
   */
 function threadredirect_install()
 {
-	global $db;
-	$db->add_column("threads", "redirect_url", "VARCHAR(45) NULL DEFAULT NULL"); 
+	global $db, $lang;
+	$lang->load("threadredirect", true);
+	
+	$db->add_column("threads", "redirect_url", "VARCHAR(45) NULL DEFAULT NULL");
+	
+	// Settings
+	$setting_group = array(
+		'name' 			=> 'threadredirect',
+		'title' 		=> 'Thread Redirect',
+		'description' 	=> $lang->threadredirect_desc,
+		'disporder' 	=> 5,
+		'isdefault' 	=> 0
+	);
+	$gid = $db->insert_query("settinggroups", $setting_group);
+	
+	$setting = array(
+		"name"			=> "threadredirect_groups",
+		"title"			=> $lang->threadredirect_allowed_groups,
+		"description"	=> $lang->threadredirect_allowed_groups_desc,
+		"optionscode"	=> "groupselect",
+		"value"			=> '',
+		"disporder"		=> 1,
+		"gid"			=> $gid
+	);
+	$db->insert_query("settings", $setting);
+	
+	// Rebuild settings
+	rebuild_settings();
 }
 
 /**
@@ -70,6 +96,12 @@ function threadredirect_uninstall()
 	
 	// Drop the redirect url field on the threads table
 	$db->drop_column("threads", "redirect_url"); 
+	
+	$db->delete_query('settings', "name IN ('threadredirect_groups')");
+	$db->delete_query('settinggroups', "name = 'threadredirect'");
+
+	// Rebuild settings
+	rebuild_settings();
 }
 
 /**
@@ -98,6 +130,34 @@ function threadredirect_activate()
 }
 
 /**
+  * Check if $user has permission to create a redirecting thread
+  */
+function has_permission($mybb, $user)
+{
+	$user_groups = explode(',', $user['usergroup']);
+	$allowed_groups = explode(',', $mybb->settings['threadredirect_groups']);
+	
+	// All groups are allowed
+	if ($mybb->settings['threadredirect_groups'] == -1) {
+		return true;
+	}
+	
+	// Include any additional groups
+	if (!empty($user['additionalgroups'])) {
+		$user_groups = array_merge($user_groups, explode(',', $user['additionalgroups']));
+	}
+	
+	// Check if the user is included in $allowed_groups
+	foreach ($user_groups as $group) {
+		if (array_search($group, $allowed_groups) !== false) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+/**
   * Called when the plugin is deactived
   */
 function threadredirect_deactivate()
@@ -117,7 +177,10 @@ function threadredirect_deactivate()
 function threadredirect_newthread_start()
 {
 	global $lang, $mybb, $templates, $post_errors, $thread, $threadredirect;
-	eval("\$threadredirect = \"".$templates->get("threadredirect")."\";");
+	
+	if (has_permission($mybb, $mybb->user)) {
+		eval("\$threadredirect = \"".$templates->get("threadredirect")."\";");
+	}
 }
 
 /**
@@ -128,7 +191,7 @@ function threadredirect_newthread_do_newthread_start()
 	global $db, $mybb, $tid, $new_thread;
 		
 	// If the user is creating a redirect thread and the message body is empty, allow them to continue
-	if (empty($mybb->get_input('message')) && !empty($mybb->get_input('threadredirect'))) {
+	if (empty($mybb->get_input('message')) && !empty($mybb->get_input('threadredirect')) && has_permission($mybb, $mybb->user)) {
 		// Seems like validation for the message body is hard-coded, add a placeholder to get around the validation
 		$mybb->input["message"] = $mybb->get_input('threadredirect');
 	}
@@ -141,10 +204,12 @@ function threadredirect_newthread_do_newthread_end()
 {
 	global $db, $mybb, $tid, $new_thread;
 
-	$redirect_url = array(
-		"redirect_url" => $db->escape_string($mybb->get_input('threadredirect'))
-	);
-	$db->update_query("threads", $redirect_url, "tid='{$tid}'");
+	if (has_permission($mybb, $mybb->user)) {
+		$redirect_url = array(
+			"redirect_url" => $db->escape_string($mybb->get_input('threadredirect'))
+		);
+		$db->update_query("threads", $redirect_url, "tid='{$tid}'");
+	}
 }
 
 /**
