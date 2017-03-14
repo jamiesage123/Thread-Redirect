@@ -45,7 +45,7 @@ function threadredirect_install()
 	global $db, $lang;
 	$lang->load("threadredirect", true);
 	
-	$db->add_column("threads", "redirect_url", "VARCHAR(45) NULL DEFAULT NULL");
+	$db->add_column("threads", "redirect_url", "VARCHAR(225) NULL DEFAULT NULL");
 	
 	// Settings
 	$setting_group = array(
@@ -118,7 +118,7 @@ function threadredirect_activate()
 		'title'		=> 'threadredirect',
 		'template'	=> $db->escape_string('<tr>
 		<td class="trow2"><strong>' . $lang->threadredirect_redirect_url . '</strong></td>
-		<td class="trow2"><input type="text" class="textbox" name="threadredirect" size="40" maxlength="240" value="{$threadredirect}" tabindex="2" /></td>
+		<td class="trow2"><input type="text" class="textbox" name="threadredirect" size="40" maxlength="225" value="{$threadredirect}" tabindex="2" /></td>
 		</tr>'),
 		'sid'		=> '-1',
 		'version'	=> '',
