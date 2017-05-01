@@ -2,6 +2,8 @@
 
 This plugin allows threads to redirect to a URL with optional custom text.
 
+View on Extend MyBB: [https://community.mybb.com/mods.php?action=view&pid=948](https://community.mybb.com/mods.php?action=view&pid=948)
+
 ## Installation
 
 1. Upload all files inside the "UPLOAD" folder into your MyBB root directory, keeping the file structure.
