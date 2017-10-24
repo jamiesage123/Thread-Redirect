@@ -32,7 +32,7 @@ If you enter a message, when the user clicks onto the thread, they will see the 
 
 ## Credits
 
-- MyBB - [https://mybb.com](https://mybb.com)
+- MyBB - [https://www.mybb.com](https://mybb.com)
 - Jamie Sage - [https://www.jamiesage.co.uk](https://www.jamiesage.co.uk)
 
 ## License
